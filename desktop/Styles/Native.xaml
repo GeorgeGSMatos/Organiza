@@ -1,0 +1,50 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:Organiza.Wpf">
+  <Style TargetType="DataGridColumnHeader">
+    <Setter Property="Background" Value="{DynamicResource ShadeSurfaceBrush}" /><Setter Property="Foreground" Value="{DynamicResource ShadeMutedTextBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource FontCaption}" /><Setter Property="Padding" Value="10,14" /><Setter Property="BorderThickness" Value="0,0,0,1" /><Setter Property="BorderBrush" Value="{DynamicResource ShadeBorderBrush}" />
+    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="DataGridColumnHeader">
+      <Grid><Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+        <DockPanel><TextBlock x:Name="Sort" DockPanel.Dock="Right" FontFamily="{DynamicResource IconFont}" FontSize="9" Margin="4,0,0,0" VerticalAlignment="Center" Visibility="Collapsed" /><ContentPresenter VerticalAlignment="Center" /></DockPanel>
+      </Border>
+      <Thumb x:Name="PART_LeftHeaderGripper" HorizontalAlignment="Left" Width="5" Cursor="SizeWE"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="Transparent" /></ControlTemplate></Thumb.Template></Thumb>
+      <Thumb x:Name="PART_RightHeaderGripper" HorizontalAlignment="Right" Width="5" Cursor="SizeWE"><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="Transparent" /></ControlTemplate></Thumb.Template></Thumb>
+      </Grid>
+      <ControlTemplate.Triggers>
+        <Trigger Property="SortDirection" Value="Ascending"><Setter TargetName="Sort" Property="Text" Value="&#xE70E;" /><Setter TargetName="Sort" Property="Visibility" Value="Visible" /></Trigger>
+        <Trigger Property="SortDirection" Value="Descending"><Setter TargetName="Sort" Property="Text" Value="&#xE70D;" /><Setter TargetName="Sort" Property="Visibility" Value="Visible" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter.Value></Setter>
+  </Style>
+  <Style TargetType="DataGridCell">
+    <Setter Property="Padding" Value="9,12" /><Setter Property="BorderThickness" Value="0" /><Setter Property="Foreground" Value="{DynamicResource ShadeTextBrush}" /><Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="DataGridCell"><Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"><ContentPresenter VerticalAlignment="Center" /></Border></ControlTemplate></Setter.Value></Setter>
+  </Style>
+  <Style TargetType="DataGridRow">
+    <Setter Property="Background" Value="Transparent" /><Setter Property="MinHeight" Value="48" /><Setter Property="FontSize" Value="{DynamicResource FontCaption}" />
+    <Style.Triggers>
+      <MultiTrigger><MultiTrigger.Conditions><Condition Property="IsMouseOver" Value="True" /><Condition Property="IsEnabled" Value="True" /></MultiTrigger.Conditions><Setter Property="Background" Value="{DynamicResource ShadeInteractionFillBrush}" /></MultiTrigger>
+      <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource ShadeSurfaceBrush}" /></Trigger>
+      <DataTrigger Binding="{Binding Selected}" Value="True"><Setter Property="Background" Value="{DynamicResource ShadeSelectionBrush}" /></DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <Style TargetType="ContextMenu">
+    <Setter Property="OverridesDefaultStyle" Value="True" /><Setter Property="HasDropShadow" Value="False" />
+    <Setter Property="Foreground" Value="{DynamicResource ShadeTextBrush}" />
+    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ContextMenu">
+      <Border local:Material.Floating="True" Background="{DynamicResource ShadeSolidSurfaceBrush}" BorderBrush="{DynamicResource ShadeBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="5">
+        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+      </Border>
+    </ControlTemplate></Setter.Value></Setter>
+  </Style>
+  <Style TargetType="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource ShadeTextBrush}" /><Setter Property="Padding" Value="12,9" />
+    <Setter Property="FocusVisualStyle" Value="{StaticResource KeyboardFocus}" />
+    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
+      <Border x:Name="Item" Background="Transparent" Padding="{TemplateBinding Padding}" CornerRadius="5"><ContentPresenter ContentSource="Header" RecognizesAccessKey="True" /></Border>
+      <ControlTemplate.Triggers>
+        <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="Item" Property="Background" Value="{DynamicResource ShadeInteractionFillBrush}" /></Trigger>
+        <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.4" /></Trigger>
+      </ControlTemplate.Triggers>
+    </ControlTemplate></Setter.Value></Setter>
+  </Style>
+</ResourceDictionary>

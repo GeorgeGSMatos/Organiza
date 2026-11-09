@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+  <title>Organiza</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="motion.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="rules-ui.js" defer></script>
+  <script src="operations-ui.js" defer></script>
+  <script src="review-ui.js" defer></script>
+</head>
+<body>
+  <div class="window-shell">
+    <header class="titlebar" aria-label="Janela do Organiza">
+      <div class="titlebar-brand"><img src="icon.svg" alt="" width="22" height="22"><span>Organiza</span></div>
+      <div class="window-buttons">
+        <button type="button" data-action="window-minimize" aria-label="Minimizar" title="Minimizar"><svg viewBox="0 0 12 12"><path d="M1 6h10"/></svg></button>
+        <button type="button" id="maximize" data-action="window-maximize" aria-label="Maximizar" title="Maximizar"><svg viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx=".4"/></svg></button>
+        <button type="button" class="close" data-action="window-close" aria-label="Fechar" title="Fechar"><svg viewBox="0 0 12 12"><path d="m1.5 1.5 9 9m0-9-9 9"/></svg></button>
+      </div>
+    </header>
+    <aside class="sidebar">
+      <nav aria-label="Navegação principal">
+        <button class="nav-item selected" data-page="overview" aria-current="page"><span data-icon="home"></span><span>Visão geral</span></button>
+        <button class="nav-item" data-page="folders"><span data-icon="folder-line"></span><span>Pastas</span><span class="nav-count" id="folder-count" hidden></span></button>
+        <button class="nav-item" data-page="rules"><span data-icon="rules"></span><span>Regras</span></button>
+        <button class="nav-item" data-page="history"><span data-icon="clock"></span><span>Histórico</span></button>
+        <button class="nav-item" data-page="settings"><span data-icon="settings"></span><span>Configurações</span></button>
+      </nav>
+      <div class="sidebar-footer"><span class="local-dot"></span> Dados neste computador<span class="version">Organiza <span id="version">0.6.0</span></span></div>
+    </aside>
+    <main id="main" tabindex="-1"><div class="loading-state"><span class="spinner"></span><p>Abrindo seu espaço…</p></div></main>
+  </div>
+
+  <dialog id="folder-dialog" aria-labelledby="folder-dialog-title">
+    <form id="folder-form" novalidate>
+      <header class="dialog-header"><div class="dialog-icon" data-icon="folder-line"></div><button type="button" class="icon-button" data-action="close-dialog" aria-label="Fechar cadastro"><span data-icon="close"></span></button></header>
+      <h2 id="folder-dialog-title">Adicionar pasta</h2>
+      <p class="dialog-subtitle">Escolha qualquer pasta para começar a organizar do seu jeito.</p>
+      <label class="field-label" for="folder-path">Caminho da pasta <span>obrigatório</span></label>
+      <div class="path-input"><input id="folder-path" name="path" type="text" placeholder="C:\Users\SeuNome\Documentos" autocomplete="off" spellcheck="false" required aria-describedby="path-help folder-error"><button type="button" class="button secondary" data-action="pick-folder"><span data-icon="folder-line"></span>Escolher…</button></div>
+      <p class="field-help" id="path-help">Selecione no Explorador ou cole um caminho completo.</p>
+      <label class="field-label" for="folder-name">Nome no Organiza <span>opcional</span></label>
+      <input id="folder-name" name="name" type="text" maxlength="80" placeholder="Ex.: Trabalho, Fotos, My Drive" autocomplete="off">
+      <p class="field-help">Se ficar vazio, usaremos o nome da pasta.</p>
+      <label class="check-row"><input id="folder-recursive" name="includeSubfolders" type="checkbox"><span><strong>Incluir subpastas</strong><small>Considere também as pastas que estão dentro desta.</small></span></label>
+      <div class="notice"><span data-icon="shield"></span><span>Adicionar uma pasta apenas salva seu cadastro. Depois, configure as regras e confira a prévia antes de organizar.</span></div>
+      <p class="form-error" id="folder-error" role="alert" hidden></p>
+      <footer class="dialog-actions"><button type="button" class="button secondary" data-action="close-dialog">Cancelar</button><button type="submit" id="save-folder" class="button primary">Adicionar pasta</button></footer>
+    </form>
+  </dialog>
+
+  <dialog id="remove-dialog" aria-labelledby="remove-dialog-title">
+    <div class="remove-content"><div class="dialog-icon" data-icon="folder-line"></div><h2 id="remove-dialog-title">Remover pasta do Organiza?</h2><p id="remove-description"></p><p class="dialog-subtitle">Os arquivos permanecem onde estão. Somente o cadastro e suas regras serão removidos.</p><footer class="dialog-actions"><button type="button" class="button secondary" data-action="cancel-remove" autofocus>Cancelar</button><button type="button" class="button danger" data-action="confirm-remove">Remover pasta</button></footer></div>
+  </dialog>
+
+  <dialog id="rule-dialog" aria-labelledby="rule-dialog-title" class="wide-dialog">
+    <form id="rule-form" novalidate>
+      <header class="dialog-header"><div class="dialog-icon" data-icon="rules"></div><button type="button" class="icon-button" data-action="close-rule" aria-label="Fechar regra"><span data-icon="close"></span></button></header>
+      <h2 id="rule-dialog-title">Nova categoria</h2><p class="dialog-subtitle" id="rule-folder-caption"></p>
+      <label class="field-label" for="rule-name">Nome da categoria</label><input id="rule-name" maxlength="80" type="text" placeholder="Ex.: Notas fiscais">
+      <div id="simple-rule-fields"><label class="field-label" for="rule-extensions">Extensões dos arquivos</label><input id="rule-extensions" type="text" placeholder="Ex.: pdf, docx, txt"><p class="field-help">Separe por vírgulas. Não precisa colocar o ponto.</p></div>
+      <div class="advanced-toggle"><button type="button" class="text-button" data-action="rule-advanced">Opções avançadas</button></div>
+      <div id="advanced-rule-fields" hidden>
+        <label class="field-label" for="rule-match">Quando aplicar esta regra?</label><select id="rule-match"><option value="all">Todas as condições (E)</option><option value="any">Pelo menos uma condição (OU)</option></select>
+        <div id="condition-list"></div><button type="button" class="text-button" data-action="add-condition"><span data-icon="plus"></span>Adicionar condição</button>
+        <div class="form-columns"><div><label class="field-label" for="rule-scope">Escopo</label><select id="rule-scope"><option value="inherit">Seguir configuração da pasta</option><option value="root">Somente pasta principal</option></select></div><div><label class="field-label" for="rule-action">Ação da regra</label><select id="rule-action"><option value="move">Organizar após confirmação</option><option value="suggest">Somente sugerir</option></select></div></div>
+      </div>
+      <label class="field-label" for="rule-destination-mode">Destino dos arquivos</label><select id="rule-destination-mode"><option value="relative">Subpasta dentro da origem</option><option value="absolute">Outro caminho completo</option></select>
+      <div class="path-input destination-input"><input id="rule-destination" type="text" aria-label="Caminho de destino" placeholder="Ex.: Documentos/Notas fiscais"><button type="button" class="button secondary" data-action="pick-destination" hidden>Escolher…</button></div><p class="field-help" id="destination-help">A pasta só será criada quando você organizar os arquivos.</p>
+      <label class="check-row"><input id="rule-enabled" type="checkbox" checked><span><strong>Regra ativa</strong><small>Regras pausadas ficam salvas, mas não entram na prévia.</small></span></label>
+      <p class="form-error" id="rule-error" role="alert" hidden></p>
+      <footer class="dialog-actions"><button type="button" class="button secondary" data-action="close-rule">Cancelar</button><button type="submit" class="button primary" id="save-rule">Salvar regra</button></footer>
+    </form>
+  </dialog>
+  <dialog id="policy-dialog" aria-labelledby="policy-title" class="wide-dialog">
+    <form id="policy-form" novalidate><h2 id="policy-title">Exceções e revisão</h2><p class="dialog-subtitle" id="policy-caption"></p>
+      <label class="field-label" for="exclude-names">Ignorar nomes que contenham</label><textarea id="exclude-names" rows="2" placeholder="rascunho&#10;confidencial"></textarea><p class="field-help">Um trecho por linha; não diferencia maiúsculas e minúsculas.</p>
+      <label class="field-label" for="exclude-extensions">Ignorar extensões</label><input type="text" id="exclude-extensions" placeholder="Ex.: bak, log">
+      <label class="field-label" for="exclude-files">Caminhos mantidos fora da organização</label><textarea id="exclude-files" rows="3" placeholder="arquivo.pdf&#10;Projetos/rascunho.txt"></textarea><p class="field-help">Caminhos exatos, relativos à origem. Remova uma linha para voltar a sugerir esse arquivo.</p>
+      <label class="field-label" for="exclude-subfolders">Ignorar subpastas</label><textarea id="exclude-subfolders" rows="2" placeholder="Backup&#10;Projetos/Em andamento"></textarea><p class="field-help">Caminhos relativos à origem, um por linha. Inclui o conteúdo dessas subpastas.</p>
+      <div class="form-columns"><div><label class="field-label" for="review-above">Revisar arquivos acima de (MB)</label><input id="review-above" type="number" min="1" max="100000000" step="any"></div><div><label class="field-label" for="min-age">Esperar sem alterações (segundos)</label><input id="min-age" type="number" min="30" max="86400" step="1"></div></div>
+      <label class="check-row"><input id="review-unknown" type="checkbox"><span><strong>Revisar formatos incomuns</strong><small>Mesmo com uma regra, formatos fora dos tipos comuns precisam de revisão.</small></span></label>
+      <div class="notice"><span data-icon="info"></span><span>Downloads temporários e atalhos são ignorados. A espera por alterações não comprova que uma sincronização terminou.</span></div><p class="form-error" id="policy-error" role="alert" hidden></p>
+      <footer class="dialog-actions"><button type="button" class="button secondary" data-action="close-policy">Cancelar</button><button type="submit" class="button primary" id="save-policy">Salvar preferências</button></footer>
+    </form>
+  </dialog>
+  <dialog id="delete-rule-dialog" aria-labelledby="delete-rule-title"><h2 id="delete-rule-title">Remover categoria?</h2><p id="delete-rule-description"></p><p class="dialog-subtitle">A regra será removida desta pasta. Os arquivos e as pastas existentes permanecem onde estão.</p><footer class="dialog-actions"><button type="button" class="button secondary" data-action="cancel-delete-rule" autofocus>Cancelar</button><button type="button" class="button danger" data-action="confirm-delete-rule">Remover categoria</button></footer></dialog>
+
+
+  <dialog id="move-dialog" aria-labelledby="move-title" class="wide-dialog"><h2 id="move-title">Confirmar organização</h2><p class="dialog-subtitle" id="move-caption"></p><div class="move-targets" id="move-targets"></div><label class="check-row" id="approve-review-row" hidden><input type="checkbox" id="approve-review"><span><strong>Revisei e aprovo os itens que exigem revisão</strong><small>Esta aprovação vale somente para a seleção abaixo.</small></span></label><div class="notice"><span data-icon="shield"></span><span>Nomes ocupados recebem sufixo. Se um arquivo mudar, estiver em uso ou não puder ser verificado, ele será preservado para revisão.</span></div><p class="form-error" id="move-error" role="alert" hidden></p><footer class="dialog-actions"><button class="button secondary" data-action="close-move">Cancelar</button><button class="button primary" id="confirm-move" data-action="confirm-move">Confirmar e organizar</button></footer></dialog>
+  <dialog id="monitor-dialog" aria-labelledby="monitor-title" class="wide-dialog"><h2 id="monitor-title">Organização automática</h2><p class="dialog-subtitle">Ative por pasta depois de revisar a prévia. O monitoramento funciona enquanto o app estiver aberto e começa pausado ao reabrir.</p><div id="monitor-folders"></div><div class="notice"><span data-icon="info"></span><span>Arquivos sem regra única ou que exigem revisão ficam no lugar. Nomes repetidos recebem sufixo. Pausar interrompe a fila após o arquivo atual.</span></div><p class="form-error" id="monitor-error" role="alert" hidden></p><footer class="dialog-actions"><button class="button secondary" data-action="close-monitor">Cancelar</button><button class="button primary" id="confirm-monitor" data-action="confirm-monitor">Ativar pastas selecionadas</button></footer></dialog>
+  <dialog id="undo-dialog" aria-labelledby="undo-title"><h2 id="undo-title">Desfazer movimentação?</h2><p id="undo-caption"></p><p class="dialog-subtitle">O arquivo precisa manter o conteúdo registrado, e o local original deve estar livre. Nenhum arquivo será substituído.</p><p class="form-error" id="undo-error" role="alert" hidden></p><footer class="dialog-actions"><button class="button secondary" data-action="close-undo">Cancelar</button><button class="button primary" data-action="confirm-undo">Desfazer</button></footer></dialog>
+
+
+  <dialog id="review-dialog" aria-labelledby="review-title" class="wide-dialog">
+    <form id="review-form" novalidate><header class="dialog-header"><div class="dialog-icon" data-icon="rules"></div><button type="button" class="icon-button" data-action="review-close" aria-label="Fechar sugestão"><span data-icon="close"></span></button></header><h2 id="review-title">Decidir destino</h2><p class="dialog-subtitle" id="review-caption"></p>
+      <div id="review-file-choices" class="review-file-choices"></div><div class="review-selection-actions"><button type="button" class="text-button" data-action="review-selection-keep">Manter seleção onde está</button><button type="button" class="text-button trash-choice" data-action="review-selection-trash">Enviar seleção à Lixeira</button></div>
+      <label class="field-label" for="review-mode">Como organizar?</label><select id="review-mode"><option value="new">Criar uma categoria</option><option value="existing">Usar uma categoria existente</option></select>
+      <div id="review-existing-fields"><label class="field-label" for="review-category">Categoria existente</label><select id="review-category"></select><p class="field-help">Usa o destino da categoria. Não altera sua regra atual.</p></div>
+      <div id="review-new-fields"><label class="field-label" for="review-category-name">Nome da nova categoria</label><input id="review-category-name" type="text" maxlength="80" placeholder="Ex.: Design"></div>
+      <label class="field-label" for="review-destination-mode">Destino</label><select id="review-destination-mode"><option value="relative">Subpasta dentro da origem</option><option value="absolute">Outro caminho completo</option></select><div class="path-input destination-input"><input id="review-destination" type="text" aria-label="Destino da sugestão"><button type="button" class="button secondary" data-action="review-pick-destination" hidden>Escolher…</button></div>
+      <label class="check-row"><input id="review-future" type="checkbox"><span><strong id="review-future-label">Criar regra para os próximos arquivos deste formato</strong><small>Segue as preferências de revisão desta pasta. Na categoria existente, cria uma regra adicional sem alterar a atual.</small></span></label>
+      <div class="notice"><span data-icon="info"></span><span id="review-once-help">Sem esta opção, a decisão vale só para a seleção. Uma categoria nova fica disponível com sua regra para próximos arquivos pausada.</span></div>
+      <p class="form-error" id="review-error" role="alert" hidden></p><footer class="dialog-actions"><button type="button" class="button secondary" data-action="review-close">Cancelar</button><button type="submit" id="review-apply" class="button primary">Preparar na prévia</button></footer>
+    </form>
+  </dialog>
+  <dialog id="review-keep-dialog" aria-labelledby="review-keep-title"><h2 id="review-keep-title">Manter os arquivos onde estão</h2><p class="dialog-subtitle" id="review-keep-caption"></p><div class="keep-options"><button class="button secondary" data-action="review-defer">Deixar para depois nesta sessão</button><button class="button secondary" data-action="review-keep">Não sugerir novamente estes caminhos</button></div><p class="field-help">A segunda opção cria exceções de caminho exato em Exceções e revisão. Nenhum arquivo é movido.</p><p class="form-error" id="review-keep-error" role="alert" hidden></p><footer class="dialog-actions"><button class="button secondary" data-action="review-keep-close">Cancelar</button></footer></dialog>
+  <dialog id="review-trash-dialog" aria-labelledby="review-trash-title" class="wide-dialog"><h2 id="review-trash-title">Enviar para a Lixeira?</h2><p class="dialog-subtitle">Escolha os arquivos que reconhece como desnecessários. Esta é uma ação manual e nunca vira regra automática.</p><div id="trash-file-choices" class="review-file-choices"></div><div class="notice"><span data-icon="info"></span><span>Para restaurar depois, use a Lixeira do Windows. Se o sistema não puder reciclar um arquivo, o app não tenta excluí-lo permanentemente.</span></div><p class="form-error" id="review-trash-error" role="alert" hidden></p><footer class="dialog-actions"><button class="button secondary" data-action="review-trash-close">Cancelar</button><button class="button danger" id="review-trash-confirm" data-action="review-trash-confirm">Confirmar envio para a Lixeira</button></footer></dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

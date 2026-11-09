@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><UseWindowsForms>true</UseWindowsForms><EnableWindowsTargeting>true</EnableWindowsTargeting><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition><StartupObject>Program</StartupObject></PropertyGroup>
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" /><Using Remove="System.Drawing" />
+    <ApplicationDefinition Include="../App.xaml" Link="App.xaml" />
+    <Page Include="../MainWindow.xaml" Link="MainWindow.xaml" /><Page Include="../Styles/*.xaml" Link="Styles/%(Filename)%(Extension)" />
+    <Compile Include="../**/*.cs" Exclude="../Checks/**;../obj/**;../bin/**" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Page Include="../Presentation/**/*.xaml" Link="Presentation/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Resource Include="../Assets/Organiza.ico" Link="Assets/Organiza.ico" />
+  </ItemGroup>
+</Project>

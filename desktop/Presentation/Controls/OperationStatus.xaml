@@ -1,0 +1,9 @@
+<UserControl x:Class="Organiza.Wpf.Presentation.Controls.OperationStatus" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Organiza.Wpf" Focusable="False">
+  <StackPanel>
+    <DockPanel>
+      <TextBlock x:Name="Indicator" Style="{StaticResource FluentIcon}" FontSize="{DynamicResource FontBody}" Margin="0,0,8,0" />
+      <TextBlock x:Name="StatusText" Text="Abrindo seu espaço…" Style="{StaticResource MutedText}" FontSize="{DynamicResource FontStatus}" TextTrimming="CharacterEllipsis" ui:UiMotion.TextFeedback="True" AutomationProperties.LiveSetting="Polite" />
+    </DockPanel>
+    <ProgressBar x:Name="Progress" Visibility="Collapsed" Height="3" Maximum="100" Margin="0,7,12,0" Foreground="{DynamicResource ShadeAccentBrush}" Background="{DynamicResource ShadeSurfaceBrush}" />
+  </StackPanel>
+</UserControl>

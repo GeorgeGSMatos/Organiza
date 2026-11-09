@@ -20,3 +20,7 @@ A interface WPF se comunica com o motor Node.js por pipes privados; não há ser
 O perfil normal fica em `%APPDATA%\Organiza`. Desenvolvimento usa `.dev/profile`, com serviços restritos para evitar interferência no uso normal. Fechar a janela principal recolhe a versão normal à bandeja; **Sair** conclui o encerramento.
 
 Os estilos usam recursos compartilhados para cores, medidas e estados. Ajuda contextual fica na navegação; informações do produto e diagnóstico ficam no cartão Sobre de Configurações. Recursos de composição respeitam as preferências e capacidades do Windows.
+
+## Código histórico Electron
+
+`src/renderer`, `src/main/main.cjs`, `src/main/preload.cjs`, `test/electron-entry.cjs` e `test/ui` são referências da interface anterior. O manifesto ativo não instala Electron, electron-builder ou Playwright e não oferece comandos para empacotar essa interface antiga. Para pesquisar o ambiente histórico, consulte o primeiro commit do repositório; os comandos atuais de validação usam o motor e o cliente WPF.

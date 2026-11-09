@@ -36,3 +36,7 @@ consistentes, repete as verificações e cria um rascunho para revisão.
 A primeira execução no GitHub expôs fixtures que comparavam caminhos temporários curtos 8.3 com os caminhos canônicos retornados pelo cadastro de pastas. As mesmas duas falhas foram reproduzidas localmente usando um alias 8.3. As fixtures passaram a normalizar o diretório temporário antes de montar os cenários, preservando todas as asserções. A distribuição pública usa a versão 0.8.1; a tag 0.8.0 permanece no histórico inicial, sem reescrita.
 
 Após a correção, os 20 testes de organização passaram também com TEMP/TMP apontando para um alias curto 8.3, na mesma reprodução que antes falhava. A rodada Windows completa permaneceu aprovada.
+
+## Dependências de desenvolvimento
+
+O alerta de minimatch foi rastreado ao empacotamento Electron legado. Electron, electron-builder e Playwright não participam do cliente WPF nem dos testes atuais; suas dependências e comandos foram removidos do manifesto ativo, preservando o código histórico para consulta. O motor atual usa módulos nativos do Node, sem dependências npm. A auditoria npm do manifesto final retornou zero vulnerabilidades.

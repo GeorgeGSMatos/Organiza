@@ -2,6 +2,8 @@
 
 ## 0.8.1
 
+- Dependências e comandos do empacotamento Electron removidos do manifesto ativo; o cliente WPF usa o motor Node sem dependências npm.
+
 - Diretórios temporários dos testes normalizados para nomes canônicos, incluindo ambientes Windows com nomes curtos 8.3.
 - Versão exibida pelo motor derivada do package.json, incluído no pacote WPF.
 - Compatibilidade da validação Windows/Linux no GitHub Actions.

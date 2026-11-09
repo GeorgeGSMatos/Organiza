@@ -5,51 +5,13 @@
   "description": "Organizador de pastas para Windows — interface nativa WPF",
   "author": "George GS Matos",
   "private": true,
-  "main": "src/main/main.cjs",
   "scripts": {
     "dev": "bash scripts/dev.sh",
     "start": "dotnet run --project desktop/Organiza.Wpf.csproj",
-    "start:electron-legacy": "electron .",
     "test": "node --test test/*.test.cjs",
-    "test:ui": "playwright test",
     "build:win": "powershell -NoProfile -File scripts/Build-Release.ps1",
-    "build:electron-legacy": "electron-builder --win zip --x64",
     "package:wpf": "python3 scripts/package-wpf.py",
-    "build:dir": "electron-builder --dir",
     "test:windows": "node --test test/native.windows.cjs"
-  },
-  "devDependencies": {
-    "@playwright/test": "1.64.1",
-    "electron": "45.0.0",
-    "electron-builder": "26.18.0"
-  },
-  "build": {
-    "appId": "br.organiza.desktop",
-    "productName": "Organiza",
-    "asar": true,
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "src/**/*",
-      "package.json",
-      "AUTHORS.md",
-      "LICENSE.txt",
-      "EULA.txt",
-      "NOTICE.md"
-    ],
-    "win": {
-      "target": [
-        "zip"
-      ],
-      "artifactName": "Organiza-${version}-Windows-${arch}.${ext}",
-      "icon": "src/renderer/icon.ico",
-      "signExecutable": false
-    },
-    "asarUnpack": [
-      "src/native/**/*"
-    ],
-    "copyright": "Copyright © 2026 George GS Matos. Todos os direitos reservados."
   },
   "license": "UNLICENSED"
 }

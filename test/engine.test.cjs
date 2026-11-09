@@ -7,7 +7,7 @@ const os = require('node:os');
 const { createEngine } = require('../src/engine/server.cjs');
 const { TestTransfer } = require('./transfer-test-adapter.cjs');
 async function fixture(t) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-wpf-'));
+  const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-wpf-')));
   const profile = path.join(root, 'profile'), folder = path.join(root, 'Downloads'); await fs.mkdir(folder);
   const recycled = path.join(root, 'recycled'); await fs.mkdir(recycled);
   const engine = await createEngine({ profile, transfer: new TestTransfer(), applicationRoot: path.join(root, 'application'), stabilityMs: 1, host: async (method, value) => { assert.equal(method, 'recycle'); await fs.rename(value.path, path.join(recycled, path.basename(value.path))); } });
@@ -20,7 +20,7 @@ async function fixture(t) {
 }
 test('WPF engine preserves configuration format and rejects unknown commands', async t => {
   const f = await fixture(t); await f.call('settings:update', { compactView: true });
-  const state = await f.call('state:get'); assert.equal(state.version, 3); assert.equal(state.settings.compactView, true); assert.equal(state.appVersion, '0.8.0');
+  const state = await f.call('state:get'); assert.equal(state.version, 3); assert.equal(state.settings.compactView, true); assert.equal(state.appVersion, require('../package.json').version);
   await assert.rejects(f.call('arbitrary:command'), /Comando inválido/);
   await assert.rejects(f.call('settings:update', { arbitrary: true }), /inválida/);
   assert.equal(JSON.parse(await fs.readFile(path.join(f.profile, 'config.json'))).version, 3);

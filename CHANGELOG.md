@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1
+
+- Diretórios temporários dos testes normalizados para nomes canônicos, incluindo ambientes Windows com nomes curtos 8.3.
+- Versão exibida pelo motor derivada do package.json, incluído no pacote WPF.
+- Compatibilidade da validação Windows/Linux no GitHub Actions.
+
 ## 0.8.0
 
 - Interface nativa WPF para Visão geral, Pastas, Regras, Histórico e Configurações.

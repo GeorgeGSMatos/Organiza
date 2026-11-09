@@ -1,6 +1,7 @@
 'use strict';
 // Headless engine for the native WPF client. No Electron or network endpoint.
 const path = require('node:path');
+const { version: appVersion } = require('../../package.json');
 const { Store, FolderService, UserError } = require('../main/store.cjs');
 const { RulesService } = require('../main/rules-service.cjs');
 const { PreviewService, revision } = require('../main/preview.cjs');
@@ -36,7 +37,7 @@ async function createEngine(options) {
     return { ...store.snapshot(), availability, recoveryMessage: store.recoveryMessage,
       capabilities: { organize: organizer.supported(), trash: organizer.supported() },
       monitor: { ...monitor.state(), ...session.state() }, operation: { busy: organizer.busy && organizer.kind !== 'configuration', kind: organizer.kind, recovering: organizer.recovering },
-      history: history.summary(), appVersion: '0.8.0', fileTypes: TYPES };
+      history: history.summary(), appVersion, fileTypes: TYPES };
   };
   async function change(id, action) {
     await organizer.mutate(async () => { await action(); session.suspend(id); preview.invalidate(); }); await session.reconcile(); return state();

@@ -1,7 +1,7 @@
 {
   "name": "organiza",
   "productName": "Organiza",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Organizador de pastas para Windows — interface nativa WPF",
   "author": "George GS Matos",
   "private": true,
@@ -12,7 +12,7 @@
     "start:electron-legacy": "electron .",
     "test": "node --test test/*.test.cjs",
     "test:ui": "playwright test",
-    "build:win": "dotnet publish desktop/Organiza.Wpf.csproj -c Release -r win-x64 --self-contained true -o release/wpf-0.8.0",
+    "build:win": "powershell -NoProfile -File scripts/Build-Release.ps1",
     "build:electron-legacy": "electron-builder --win zip --x64",
     "package:wpf": "python3 scripts/package-wpf.py",
     "build:dir": "electron-builder --dir",

@@ -1,4 +1,4 @@
-# Organiza WPF 0.8.0
+# Organiza WPF 0.8.1
 
 A base da interface foi reorganizada para a reconstrução aprovada das cinco telas. O mapa de responsabilidades, os componentes e as regras de manutenção estão em [Arquitetura da interface](../docs/arquitetura-interface-organiza.md). Os estilos compartilhados ficam em `Styles/Palette.xaml`, `Tokens.xaml` e `Components.xaml`; navegação em `Navigation/`; acesso ao motor e ao Windows em `Services/`; páginas em `Pages/`; componentes e modelos visuais em `Presentation/`.
 
@@ -21,7 +21,7 @@ O worker PowerShell é iniciado com diretório de trabalho em `engine/native`, s
 No Windows, com SDK .NET 8 e o Node 22.23.4 oficial x64 em `desktop/runtime/node.exe`:
 
 ```powershell
-dotnet publish desktop/Organiza.Wpf.csproj -c Release -r win-x64 --self-contained true -o release/wpf-0.8.0
+dotnet publish desktop/Organiza.Wpf.csproj -c Release -r win-x64 --self-contained true -o release/wpf-0.8.1
 python scripts/package-wpf.py
 ```
 

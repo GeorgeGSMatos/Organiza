@@ -10,7 +10,7 @@ version = json.loads((root / "package.json").read_text(encoding="utf-8"))["versi
 published = root / "release" / f"wpf-{version}"
 output = root / "outputs"
 output.mkdir(exist_ok=True)
-required = ["Organiza.exe", "Organiza.dll", "Organiza.runtimeconfig.json", "coreclr.dll",
+required = ["Organiza.exe", "Organiza.dll", "Organiza.runtimeconfig.json", "package.json", "coreclr.dll",
             "PresentationFramework.dll", "runtime/node.exe", "runtime/LICENSE-Node.txt",
             "engine/engine/worker.cjs", "engine/engine/server.cjs", "engine/native/worker.ps1", "engine/native/SafeTransfer.cs"]
 legal_documents = ("AUTHORS.md", "LICENSE.txt", "EULA.txt", "NOTICE.md")

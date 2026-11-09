@@ -18,7 +18,7 @@ $name = Split-Path $TargetDirectory -Leaf
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss-fff'
 $stage = Join-Path $parent ($name + '-update-' + $stamp)
 $backup = Join-Path $parent ($name + '-backup-' + $stamp)
-$required = @('Organiza.exe','Organiza.dll','runtime\node.exe','engine\engine\server.cjs','engine\engine\monitoring-session.cjs','engine\main\store.cjs','engine\main\preview.cjs')
+$required = @('Organiza.exe','Organiza.dll','package.json','runtime\node.exe','engine\engine\server.cjs','engine\engine\monitoring-session.cjs','engine\main\store.cjs','engine\main\preview.cjs')
 function Assert-ApplicationClosed {
     $running = @(Get-CimInstance Win32_Process -Filter "Name='Organiza.exe'" | Where-Object {
         $_.ExecutablePath -and $_.ExecutablePath.StartsWith($TargetDirectory + '\', [StringComparison]::OrdinalIgnoreCase)

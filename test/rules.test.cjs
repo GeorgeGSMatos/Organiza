@@ -9,7 +9,7 @@ const { RulesService } = require('../src/main/rules-service.cjs');
 const { PreviewService, matchesCondition } = require('../src/main/preview.cjs');
 const { normalizeRule, normalizePolicy, defaultOrganization } = require('../src/main/rules-config.cjs');
 async function fixture(t, recursive = false) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-rules-')); t.after(() => fs.rm(root,{ recursive:true,force:true }));
+  const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-rules-'))); t.after(() => fs.rm(root,{ recursive:true,force:true }));
   const directory = path.join(root,'Origem'); await fs.mkdir(directory);
   const store = new Store(path.join(root,'app','config.json')); await store.load();
   await new FolderService(store).save({ path:directory,name:'Origem',includeSubfolders:recursive });

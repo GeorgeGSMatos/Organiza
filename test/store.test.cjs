@@ -6,7 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const { Store, FolderService, normalizeFolderInput } = require('../src/main/store.cjs');
 async function fixture(t) {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-test-'));
+  const root = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), 'organiza-test-')));
   t.after(() => fs.rm(root, { recursive: true, force: true }));
   const file = path.join(root, 'app', 'config.json');
   const store = new Store(file); await store.load();

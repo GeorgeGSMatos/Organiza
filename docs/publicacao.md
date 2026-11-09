@@ -8,7 +8,7 @@ O repositório registra o estado atual dos fontes, sem reconstruir commits anter
 - Motor Node Linux: 87 testes aprovados, incluindo links simbólicos.
 - Motor Node Windows: 86 aprovados e um dispensado por falta de privilégio de symlink de arquivo; a regressão foi aprovada no Linux.
 - Transferências nativas Windows: três aprovadas; teste entre volumes dispensado por ausência de um segundo volume de teste.
-- WPF/integração Windows: 126 verificações aprovadas, incluindo inicialização, identidade de estados, modos por pasta e bandeja.
+- WPF/integração Windows: 128 verificações aprovadas, incluindo inicialização, identidade de estados, modos por pasta e bandeja.
 - Supervisor WSL: seis testes aprovados.
 - Builds de produção Windows x64 gerados com SDK .NET 8 no WSL.
 - Sintaxe dos scripts PowerShell conferida pelo parser do Windows.
@@ -40,3 +40,5 @@ Após a correção, os 20 testes de organização passaram também com TEMP/TMP 
 ## Dependências de desenvolvimento
 
 O alerta de minimatch foi rastreado ao empacotamento Electron legado. Electron, electron-builder e Playwright não participam do cliente WPF nem dos testes atuais; suas dependências e comandos foram removidos do manifesto ativo, preservando o código histórico para consulta. O motor atual usa módulos nativos do Node, sem dependências npm. A auditoria npm do manifesto final retornou zero vulnerabilidades.
+
+Os casos responsivos verificam uma e duas colunas em larguras lógicas controladas, sem depender da resolução do desktop do runner. A integração da tela verifica o número de colunas para a largura efetivamente disponível.

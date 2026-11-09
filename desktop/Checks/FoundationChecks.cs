@@ -94,6 +94,26 @@ internal static class FoundationChecks
             app.Resources["FontCaption"] = previousCaption;
         var trash = Ui.Icon(AppIcon.Trash, "Enviar à Lixeira", () => { });
         check(trash.ToolTip?.ToString() == "Enviar à Lixeira" && Equals(trash.Foreground, app.FindResource("ShadeDangerBrush")), "Trash icons inherit the shared danger color and an accessible action label");
+        var cards = Ui.Cards(new[] { new Border { Height = 80 }, new Border { Height = 80 } });
+        void ArrangeCards(double width)
+        {
+            // Exercise logical layout without relying on the runner's desktop resolution.
+            for (var pass = 0; pass < 3; pass++)
+            {
+                cards.Measure(new Size(width, double.PositiveInfinity));
+                cards.Arrange(new Rect(0, 0, width, cards.DesiredSize.Height));
+                cards.UpdateLayout();
+                app.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            }
+        }
+        ArrangeCards(cards.ColumnsBreakpoint + 80);
+        var first = (FrameworkElement)cards.Children[0];
+        var second = (FrameworkElement)cards.Children[1];
+        check(Math.Abs(first.TranslatePoint(new Point(), cards).Y - second.TranslatePoint(new Point(), cards).Y) < 2,
+            "Cards use two columns above the logical width breakpoint");
+        ArrangeCards(cards.ColumnsBreakpoint - 80);
+        check(second.TranslatePoint(new Point(), cards).Y > first.TranslatePoint(new Point(), cards).Y + 20,
+            "Cards use one column below the logical width breakpoint");
         host.Close();
     }
 

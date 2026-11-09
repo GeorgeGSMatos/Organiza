@@ -164,7 +164,9 @@ internal static class Program
                 var cards = Children<WrapPanel>(window).First(p => p.Children.OfType<Border>().Count() >= 2);
                 var first = (Border)cards.Children[0];
                 var second = (Border)cards.Children[1];
-                Check(Math.Abs(first.TranslatePoint(new Point(), window).Y - second.TranslatePoint(new Point(), window).Y) < 2, "Rules use two columns at the regular window width");
+                var breakpoint = DesignResources.Number("CardsBreakpoint");
+                var sameRow = Math.Abs(first.TranslatePoint(new Point(), window).Y - second.TranslatePoint(new Point(), window).Y) < 2;
+                Check(sameRow == (cards.ActualWidth >= breakpoint), "Rules column count follows the actual available viewport");
                 window.Width = 1000;
                 await Task.Delay(150);
                 window.UpdateLayout();

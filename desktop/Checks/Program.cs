@@ -88,7 +88,8 @@ internal static class Program
         {
             try
             {
-                var dialog = Application.Current.Windows.OfType<UiDialog>().First(w => w.IsVisible);
+                await Wait(() => Application.Current.Windows.OfType<UiDialog>().Any(w => w.IsVisible && w.Owner == window));
+                var dialog = Application.Current.Windows.OfType<UiDialog>().First(w => w.IsVisible && w.Owner == window);
                 fill(dialog);
                 if (capture is not null)
                     await Save(dialog, capture);
@@ -138,7 +139,8 @@ internal static class Program
         await client.SaveFolder(new FolderDraft(documents, "Documentos", false));
         var window = new MainWindow { Left = -20000, Top = -20000, ShowActivated = false, ShowInTaskbar = false, WindowStartupLocation = WindowStartupLocation.Manual };
         window.Show();
-        await window.Connect(bridge);
+        var delayedEngine = new DelayedPlanEngine(bridge);
+        await window.Connect(delayedEngine);
         await Task.Delay(250);
         Check(Children<TextBlock>(window).Any(t => t.Text == "Downloads"), "Native overview renders saved folders");
         Check(Children<TextBlock>(window).Any(t => t.Text == "3 pastas"), "Overview derives its summary from the three registered test folders");
@@ -292,13 +294,15 @@ internal static class Program
         foreach (var item in grid.Items.OfType<PreviewItem>())
             item.Selected = item.Name == "nota.pdf";
         await DriveDialog(window, "Organizar", _ => { });
+        Check(delayedEngine.DelayedPlans > 0, "Confirmation driver waits for a genuinely asynchronous engine plan");
         Check(((TextBlock)window.FindName("PageTitle")).Text == "Pastas" && Children<ComboBox>(window).Any(picker => System.Windows.Automation.AutomationProperties.GetName(picker) == "Pasta atual"), "Organizing stays in the folder workspace");
         Check(Children<DataGrid>(window).First().Items.OfType<PreviewItem>().All(r => r.Name != "nota.pdf"), "Completed files disappear from a freshly scanned list");
         Children<RadioButton>(window).First(button => Equals(button.Tag, AppPage.History)).IsChecked = true;
         await Wait(() => Children<Button>(window).Any(button => System.Windows.Automation.AutomationProperties.GetName(button) == "Desfazer movimentação"));
         await DriveDialog(window, "Desfazer movimentação", _ => { });
         Check(File.Exists(source) && await File.ReadAllTextAsync(source) == "CONTEÚDO PRESERVADO", "History undo icon restores the temporary file through its real confirmation");
-        Children<RadioButton>(window).First(button => Equals(button.Tag, AppPage.Folders)).IsChecked = true;
+        // Keep the UI on History while driving the engine directly, so its automatic
+        // folder analysis does not compete with the explicit scans in this phase.
         var preview = await bridge.Call("preview:scan", id);
         var row = preview!.Items("rows").First(r => r.S("name") == "nota.pdf");
         Check(row.S("status") == "ready", "Windows metadata produces a ready PDF");
@@ -315,8 +319,25 @@ internal static class Program
         Check(group["suggestion"].S("name") == "Design", "WPF retains metadata-only Design suggestions");
         var sink = new RecycleBin.RecycleSink();
         Check(sink.PreDeleteItem(0, null!) < 0, "Recycle sink vetoes permanent deletion");
-        Click(Find(window, "Analisar"));
-        await Wait(() => ((StackPanel)window.FindName("Navigation")).IsEnabled);
+        Children<RadioButton>(window).First(button => Equals(button.Tag, AppPage.Folders)).IsChecked = true;
+        try
+        {
+            // Let navigation finish its automatic analysis before explicitly refreshing
+            // the UI snapshot invalidated by the direct-engine operations above.
+            await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+            await Wait(() => ((StackPanel)window.FindName("Navigation")).IsEnabled &&
+                ((Button)window.FindName("StopButton")).Visibility != Visibility.Visible);
+            Click(Find(window, "Analisar"));
+            await Wait(() => ((StackPanel)window.FindName("Navigation")).IsEnabled &&
+                Children<DataGrid>(window).Any(table => table.Items.OfType<PreviewItem>().Any(item => item.Name == "nota.pdf")));
+        }
+        catch (TimeoutException error)
+        {
+            await Save(window, Path.Combine(output, "auto-analysis-timeout.png"));
+            var notice = ((TextBlock)window.FindName("AlertText")).Text;
+            var names = Children<DataGrid>(window).SelectMany(table => table.Items.OfType<PreviewItem>()).Select(item => item.Name);
+            throw new InvalidOperationException("Folder analysis did not display the fixture. Notice: " + notice + "; rows: " + string.Join(", ", names), error);
+        }
         grid = Children<DataGrid>(window).First();
         foreach (var item in grid.Items.OfType<PreviewItem>())
             item.Selected = item.Name == "nota.pdf";

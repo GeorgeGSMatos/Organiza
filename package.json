@@ -19,7 +19,7 @@
     "test:windows": "node --test test/native.windows.cjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.1",
+    "@playwright/test": "1.65.0",
     "electron": "45.0.0",
     "electron-builder": "26.18.0"
   },
